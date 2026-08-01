@@ -1,0 +1,171 @@
+--[[ SCRIPT COM PAINEL VISUAL PARA PRIMEVAL EARTH ]]
+
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+-- FUNDO DO PAINEL
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 400)
+frame.Position = UDim2.new(0.5, -150, 0.5, -200)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+frame.BackgroundTransparency = 0.1
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+-- ARREDONDAMENTO (opcional)
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+-- TÍTULO
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "🦕 Primeval Control"
+title.TextColor3 = Color3.fromRGB(255, 200, 50)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Parent = frame
+
+-- STATUS (mostra fome/sede)
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, -20, 0, 30)
+statusLabel.Position = UDim2.new(0, 10, 0, 45)
+statusLabel.Text = "Fome: 100% | Sede: 100%"
+statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextSize = 14
+statusLabel.Parent = frame
+
+-- FUNÇÃO PARA CRIAR BOTÕES
+local function criarBotao(texto, posY, cor, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8, 0, 0, 35)
+    btn.Position = UDim2.new(0.1, 0, 0, posY)
+    btn.Text = texto
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = cor
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Parent = frame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = btn
+    
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+-- VARIÁVEIS DE CONTROLE
+local autoEat = true
+local autoDrink = true
+local autoCollect = true
+local antiAfk = true
+
+-- BOTÕES (alternam liga/desliga)
+local btnEat = criarBotao("🍖 Auto-Comer: ON", 90, Color3.fromRGB(40, 180, 40), function()
+    autoEat = not autoEat
+    btnEat.Text = "🍖 Auto-Comer: " .. (autoEat and "ON" or "OFF")
+    btnEat.BackgroundColor3 = autoEat and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)
+end)
+
+local btnDrink = criarBotao("💧 Auto-Beber: ON", 135, Color3.fromRGB(40, 180, 40), function()
+    autoDrink = not autoDrink
+    btnDrink.Text = "💧 Auto-Beber: " .. (autoDrink and "ON" or "OFF")
+    btnDrink.BackgroundColor3 = autoDrink and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)
+end)
+
+local btnCollect = criarBotao("📦 Auto-Coletar: ON", 180, Color3.fromRGB(40, 180, 40), function()
+    autoCollect = not autoCollect
+    btnCollect.Text = "📦 Auto-Coletar: " .. (autoCollect and "ON" or "OFF")
+    btnCollect.BackgroundColor3 = autoCollect and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)
+end)
+
+local btnAfk = criarBotao("💤 Anti-AFK: ON", 225, Color3.fromRGB(40, 180, 40), function()
+    antiAfk = not antiAfk
+    btnAfk.Text = "💤 Anti-AFK: " .. (antiAfk and "ON" or "OFF")
+    btnAfk.BackgroundColor3 = antiAfk and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)
+end)
+
+-- BOTÃO FECHAR (X)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 18
+closeBtn.Parent = frame
+closeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+-- BOTÃO MINIMIZAR (—)
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Position = UDim2.new(1, -70, 0, 5)
+minBtn.Text = "—"
+minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBtn.BackgroundTransparency = 1
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 18
+minBtn.Parent = frame
+minBtn.MouseButton1Click:Connect(function()
+    frame.Visible = false
+end)
+
+-- BOTÃO MOSTRAR (quando minimizado)
+local showBtn = Instance.new("TextButton")
+showBtn.Size = UDim2.new(0, 50, 0, 50)
+showBtn.Position = UDim2.new(0, 10, 0, 100)
+showBtn.Text = "🦕"
+showBtn.TextSize = 30
+showBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+showBtn.Visible = false
+showBtn.Parent = screenGui
+local showCorner = Instance.new("UICorner")
+showCorner.CornerRadius = UDim.new(1, 0)
+showCorner.Parent = showBtn
+showBtn.MouseButton1Click:Connect(function()
+    frame.Visible = true
+    showBtn.Visible = false
+end)
+
+-- ATUALIZAR STATUS E FUNÇÕES
+local stats = player:WaitForChild("leaderstats")
+local fome = stats:WaitForChild("Fome")
+local sede = stats:WaitForChild("Sede")
+local character = player.Character or player.CharacterAdded:Wait()
+
+task.spawn(function()
+    while task.wait(0.5) do
+        pcall(function()
+            -- Atualiza status
+            statusLabel.Text = "🍖 Fome: " .. math.floor(fome.Value) .. "% | 💧 Sede: " .. math.floor(sede.Value) .. "%"
+            
+            -- Se o frame foi fechado, mostra botão de reabrir
+            if not frame.Visible then
+                showBtn.Visible = true
+            end
+            
+            -- Auto funções (se ativadas)
+            if autoEat and fome.Value < 30 then
+                -- lógica de comer
+            end
+            if autoDrink and sede.Value < 30 then
+                -- lógica de beber
+            end
+            if antiAfk then
+                game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+            end
+        end)
+    end
+end)
+
+print("✅ Painel Primeval Earth carregado!")
