@@ -1,4 +1,4 @@
---[[ SCRIPT COM PAINEL VISUAL PARA PRIMEVAL EARTH ]]
+--[[ SCRIPT PRIMEVAL EARTH - VERSÃO CORRIGIDA (SEM ERRO 404) ]]
 
 local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
@@ -9,13 +9,12 @@ local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 300, 0, 400)
 frame.Position = UDim2.new(0.5, -150, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-frame.BackgroundTransparency = 0.1
+frame.BackgroundTransparency = 0.15
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = screenGui
 
--- ARREDONDAMENTO (opcional)
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 12)
 corner.Parent = frame
@@ -30,11 +29,11 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 20
 title.Parent = frame
 
--- STATUS (mostra fome/sede)
+-- STATUS
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, -20, 0, 30)
 statusLabel.Position = UDim2.new(0, 10, 0, 45)
-statusLabel.Text = "Fome: 100% | Sede: 100%"
+statusLabel.Text = "Fome: --% | Sede: --%"
 statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Font = Enum.Font.Gotham
@@ -67,7 +66,7 @@ local autoDrink = true
 local autoCollect = true
 local antiAfk = true
 
--- BOTÕES (alternam liga/desliga)
+-- BOTÕES
 local btnEat = criarBotao("🍖 Auto-Comer: ON", 90, Color3.fromRGB(40, 180, 40), function()
     autoEat = not autoEat
     btnEat.Text = "🍖 Auto-Comer: " .. (autoEat and "ON" or "OFF")
@@ -106,7 +105,7 @@ closeBtn.MouseButton1Click:Connect(function()
     frame.Visible = not frame.Visible
 end)
 
--- BOTÃO MINIMIZAR (—)
+-- BOTÃO MINIMIZAR
 local minBtn = Instance.new("TextButton")
 minBtn.Size = UDim2.new(0, 30, 0, 30)
 minBtn.Position = UDim2.new(1, -70, 0, 5)
@@ -120,7 +119,7 @@ minBtn.MouseButton1Click:Connect(function()
     frame.Visible = false
 end)
 
--- BOTÃO MOSTRAR (quando minimizado)
+-- BOTÃO MOSTRAR (flutuante)
 local showBtn = Instance.new("TextButton")
 showBtn.Size = UDim2.new(0, 50, 0, 50)
 showBtn.Position = UDim2.new(0, 10, 0, 100)
@@ -129,43 +128,78 @@ showBtn.TextSize = 30
 showBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
 showBtn.Visible = false
 showBtn.Parent = screenGui
+
 local showCorner = Instance.new("UICorner")
 showCorner.CornerRadius = UDim.new(1, 0)
 showCorner.Parent = showBtn
+
 showBtn.MouseButton1Click:Connect(function()
     frame.Visible = true
     showBtn.Visible = false
 end)
 
--- ATUALIZAR STATUS E FUNÇÕES
-local stats = player:WaitForChild("leaderstats")
-local fome = stats:WaitForChild("Fome")
-local sede = stats:WaitForChild("Sede")
-local character = player.Character or player.CharacterAdded:Wait()
+-- =============================================
+-- PARTE PRINCIPAL (COM TRATAMENTO DE ERRO)
+-- =============================================
 
+local stats = player:FindFirstChild("leaderstats")
+
+-- Se não achar "leaderstats", tenta achar pelos nomes alternativos
+if not stats then
+    stats = player:FindFirstChild("Stats") or player:FindFirstChild("Status")
+end
+
+local fome, sede
+
+if stats then
+    fome = stats:FindFirstChild("Fome") or stats:FindFirstChild("Hunger") or stats:FindFirstChild("Food")
+    sede = stats:FindFirstChild("Sede") or stats:FindFirstChild("Thirst") or stats:FindFirstChild("Water")
+end
+
+-- Se ainda não achou, cria valores fictícios só pro painel não quebrar
+if not fome then
+    fome = Instance.new("NumberValue")
+    fome.Value = 100
+    fome.Parent = player
+    print("⚠️ 'Fome' não encontrado, usando valor simulado")
+end
+
+if not sede then
+    sede = Instance.new("NumberValue")
+    sede.Value = 100
+    sede.Parent = player
+    print("⚠️ 'Sede' não encontrado, usando valor simulado")
+end
+
+-- LOOP PRINCIPAL
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
             -- Atualiza status
-            statusLabel.Text = "🍖 Fome: " .. math.floor(fome.Value) .. "% | 💧 Sede: " .. math.floor(sede.Value) .. "%"
+            local fomeVal = typeof(fome) == "NumberValue" and math.floor(fome.Value) or 100
+            local sedeVal = typeof(sede) == "NumberValue" and math.floor(sede.Value) or 100
+            statusLabel.Text = "🍖 Fome: " .. fomeVal .. "% | 💧 Sede: " .. sedeVal .. "%"
             
-            -- Se o frame foi fechado, mostra botão de reabrir
+            -- Mostra botão flutuante se o painel tiver oculto
             if not frame.Visible then
                 showBtn.Visible = true
             end
             
-            -- Auto funções (se ativadas)
-            if autoEat and fome.Value < 30 then
-                -- lógica de comer
-            end
-            if autoDrink and sede.Value < 30 then
-                -- lógica de beber
-            end
+            -- ANTI-AFK
             if antiAfk then
-                game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+                local success, err = pcall(function()
+                    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+                end)
             end
         end)
     end
 end)
+
+-- NOTIFICAÇÃO DE SUCESSO (sem ícone para evitar erro 404)
+game.StarterGui:SetCore("SendNotification", {
+    Title = "🦕 Primeval Script",
+    Text = "Painel carregado com sucesso!",
+    Duration = 3
+})
 
 print("✅ Painel Primeval Earth carregado!")
