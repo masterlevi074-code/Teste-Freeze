@@ -1,7 +1,43 @@
 --[[ 
   🦕 PRIMEVAL EARTH - PAINEL PREMIUM
   Apenas Design Visual (sem funcionalidades)
-  Estilo: Dark Glass / Neon / Futurista
+  Estilo: Dark Glass / Neon / Futurista--[[ 
+  SCRIPT PRIMEVAL EARTH - VERSÃO DELTA EXECUTOR
+  Usa gethui() para garantir que o painel apareça.
+--]]
+
+local player = game.Players.LocalPlayer
+
+-- ============================================
+-- 1. CRIANDO A GUI COM gethui() (Essencial para o Delta)
+-- ============================================
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PrimevalPanel"
+screenGui.Parent = gethui() -- <--- LINHA MÁGICA PARA O DELTA!
+screenGui.ResetOnSpawn = false
+
+-- ... (o resto do script de design permanece IGUAL ao que eu te passei antes) ...
+
+-- ============================================
+-- Exemplo rápido para testar se o painel aparece:
+-- ============================================
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 200)
+frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 1, 0)
+label.Text = "✅ PAINEL DELTA FUNCIONOU!"
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.BackgroundTransparency = 1
+label.Font = Enum.Font.GothamBold
+label.TextSize = 24
+label.Parent = frame
+
+print("✅ Painel criado com sucesso no Delta Executor!")
 --]]
 
 local player = game.Players.LocalPlayer
